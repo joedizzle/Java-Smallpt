@@ -60,7 +60,8 @@ public class ImageLoop
                             double r2=2*rand(), dy=r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2);
                             Vec d = cam.cx.mul(((sx+.5 + dx)/2 + x)/w - .5).add(
                                     cam.cy.mul(((sy+.5 + dy)/2 + y)/h - .5)).add(cam.d());
-                            r = r.add(Forward.radiance(new Ray(cam.o().add(d.mul(140)), d.norm()), 0, scene).mul(.25));                           
+                            Vec v = Forward.radiance(new Ray(cam.o().add(d.mul(140)), d.norm()), 0, scene).mul(.25);                            
+                            r = r.add(v);                           
                         }
                         // Camera rays are pushed ^^^^^ forward to start in interior
                         c[i] = c[i].add(new Vec(clamp(r.x),clamp(r.y),clamp(r.z)).mul(.25/iteration));                        

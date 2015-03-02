@@ -15,6 +15,7 @@ public class Vec {
     public double x, y, z;
     
     public Vec() {x = 0; y = 0; z = 0;}
+    public Vec(double x) {this(x, x, x);}
     public Vec(double x, double y, double z){this.x = x; this.y = y; this.z = z;}
     public Vec(Vec b) {this.x = b.x; this.y = b.y; this.z = b.z;}
     
@@ -28,6 +29,8 @@ public class Vec {
     public Vec cross(Vec b) {return new Vec(y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x);}
     
     public Vec neg(){return new Vec(x*-1, y*-1, z*-1);}
+    @Override
+    public Vec clone(){return new Vec(x, y, z);}
     
     @Override
     public String toString()
