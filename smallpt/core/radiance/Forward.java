@@ -41,7 +41,41 @@ public class Forward
                 //return obj.e + f.mult(radiance(Ray(x,d),depth,Xi));
                 r = new Ray(x,d);
                 continue;
-            }            
+            }  
+            else if (obj.refl == SPEC) // Ideal SPECULAR reflection
+            {  
+                //return obj.e + f.mult(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi));
+                r = new Ray(x,r.d.sub(n.mul(2*n.dot(r.d))));
+                continue;
+            }
+            
+            Ray reflRay = new Ray(x, r.d.sub(n.mul(2*n.dot(r.d))));     // Ideal dielectric REFRACTION
+            boolean into = n.dot(nl)>0;                // Ray from outside going in?
+            double nc=1, nt=1.5, nnt=into?nc/nt:nt/nc, ddn=r.d.dot(nl), cos2t;
+            if ((cos2t=1-nnt*nnt*(1-ddn*ddn))<0) // Total internal reflection
+            {    
+                //return obj.e + f.mult(radiance(reflRay,depth,Xi));
+                r = reflRay;
+                continue;
+            }
+            
+            Vec tdir = (r.d.mul(nnt).sub(n.mul(((into?1:-1)*(ddn*nnt+sqrt(cos2t)))))).norm();
+            double a=nt-nc, b=nt+nc, R0=a*a/(b*b), c = 1-(into?-ddn:tdir.dot(n));
+            double Re=R0+(1-R0)*c*c*c*c*c,Tr=1-Re,P=.25+.5*Re,RP=Re/P,TP=Tr/(1-P);
+            // return obj.e + f.mult(erand48(Xi)<P ?
+            //                       radiance(reflRay,    depth,Xi)*RP:
+            //                       radiance(Ray(x,tdir),depth,Xi)*TP);
+            if (Math.random()<P)
+            {
+                cf = cf.mul(RP);
+                r = reflRay;
+            }
+            else
+            {
+                cf = cf.mul(TP);
+                r = new Ray(x,tdir);
+            }
+            continue;        
         }
     }     
 }
